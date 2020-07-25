@@ -32,7 +32,7 @@ async function generate(date, options = {}) {
   }
 
   // Crawler
-  const output = scrapeData(srcs)
+  const output = await scrapeData(srcs)
     .then(writeRawRegression)
     // processor
     .then(rateSources)

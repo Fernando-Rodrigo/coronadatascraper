@@ -15,6 +15,7 @@ const scraper = {
   url:
     'https://docs.google.com/spreadsheets/d/1CwZA4RPNf_hUrwzNLyGGNHRlh1cwl8vDHwIoae51Hac/gviz/tq?tqx=out:csv&sheet=timeseries',
   aggregate: 'county',
+  timeseries: true,
   curators: [
     {
       name: 'The Mercury News',
@@ -66,6 +67,15 @@ const scraper = {
         }
         if (stateData['Hospital Confirmed Total'] !== '') {
           stateObj.hospitalized = parse.number(stateData['Hospital Confirmed Total']);
+        }
+        if (stateData['Hospital Confirmed Current'] !== '') {
+          stateObj.hospitalized_current = parse.number(stateData['Hospital Confirmed Current']);
+        }
+        if (stateData['ICU Total'] !== '') {
+          stateObj.icu = parse.number(stateData['ICU Total']);
+        }
+        if (stateData['ICU Current'] !== '') {
+          stateObj.icu_current = parse.number(stateData['ICU Current']);
         }
         counties.push(stateObj);
       }

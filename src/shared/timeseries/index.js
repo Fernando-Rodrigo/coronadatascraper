@@ -19,7 +19,10 @@ const caseDataProps = [
   'active',
   'tested',
   'hospitalized',
+  'hospitalized_current',
   'discharged',
+  'icu',
+  'icu_current',
   'growthFactor'
 ];
 
@@ -88,7 +91,7 @@ async function generateTidyCSV(timeseriesByLocation) {
 
   csvData.splice(0, 0, columns);
 
-  return fs.writeCSV(path.join('dist', 'timeseries-tidy.csv'), csvData);
+  return csvData;
 }
 
 async function generateCSV(timeseriesByLocation) {
@@ -144,7 +147,7 @@ async function generateCSV(timeseriesByLocation) {
 
   csvData.splice(0, 0, columns);
 
-  return fs.writeCSV(path.join('dist', 'timeseries.csv'), csvData);
+  return csvData;
 }
 
 async function generateJHUCSV(timeseriesByLocation) {
@@ -188,7 +191,7 @@ async function generateJHUCSV(timeseriesByLocation) {
   columns = columns.concat(dates);
   csvData.splice(0, 0, columns);
 
-  return fs.writeCSV(path.join('dist', 'timeseries-jhu.csv'), csvData);
+  return csvData;
 }
 
 function getGrowthfactor(casesToday, casesYesterday) {
@@ -251,8 +254,9 @@ async function generateTimeseries(options = {}) {
           strippedLocation.cases,
           timeseriesByLocation[name].dates[previousDate].cases
         );
-        if (growthFactor === null) {
-          strippedLocation.growthFactor = growthFactor;
+        if (growthFactor !== null) {
+          const rounded = Math.round((growthFactor + Number.EPSILON) * 100) / 100;
+          strippedLocation.growthFactor = rounded;
         }
       }
 
@@ -262,18 +266,25 @@ async function generateTimeseries(options = {}) {
     previousDate = date;
   }
 
-  await fs.writeJSON(path.join('dist', 'timeseries-byLocation.json'), timeseriesByLocation, { space: 0 });
-  await fs.writeJSON(path.join('dist', 'features.json'), featureCollection, { space: 0 });
+  const d = options.writeTo;
+  await fs.ensureDir(d);
+
+  await fs.writeJSON(path.join(d, 'timeseries-byLocation.json'), timeseriesByLocation, { space: 0 });
+  await fs.writeJSON(path.join(d, 'features.json'), featureCollection, { space: 0 });
 
   const { locations, timeseriesByDate } = transform.transposeTimeseries(timeseriesByLocation);
-  await fs.writeJSON(path.join('dist', `timeseries.json`), timeseriesByDate, { space: 2 });
-  await fs.writeJSON(path.join('dist', `locations.json`), locations, { space: 2 });
+  await fs.writeJSON(path.join(d, `timeseries.json`), timeseriesByDate, { space: 2 });
+  await fs.writeJSON(path.join(d, `locations.json`), locations, { space: 2 });
 
-  await generateCSV(timeseriesByLocation);
+  let csvData = null;
+  csvData = await generateCSV(timeseriesByLocation);
+  await fs.writeCSV(path.join(d, 'timeseries.csv'), csvData);
 
-  await generateTidyCSV(timeseriesByLocation);
+  csvData = await generateTidyCSV(timeseriesByLocation);
+  await fs.writeCSV(path.join(d, 'timeseries-tidy.csv'), csvData);
 
-  await generateJHUCSV(timeseriesByLocation);
+  csvData = await generateJHUCSV(timeseriesByLocation);
+  await fs.writeCSV(path.join(d, 'timeseries-jhu.csv'), csvData);
 }
 
 generateTimeseries(argv)

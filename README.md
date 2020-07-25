@@ -1,3 +1,18 @@
+# THIS PROJECT IS BEING REPLACED BY `Li`
+
+**This project is being replaced by [Li](https://github.com/covidatlas/li), the next-generation serverless crawler for COVID-19 data.**
+
+The reasons for the switchover are documented in [Issue 782](https://github.com/covidatlas/coronadatascraper/issues/782).
+
+We are not _actively_ accepting PRs for this repository, but are still using this repo to track issues.
+
+> Scraper code written for this project is not compatible with Li, see that project for examples.  We have some helpers to assist in migrating code, see [this document](https://docs.google.com/document/d/1ITPU0hESswmiWw88Pl1eI26oIQtMJw1YUeD8mWEPIeE/edit#).
+
+Thanks very much!
+
+
+---
+
 # coronadatascraper
 > A crawler that scrapes COVID-19 Coronavirus data from government and curated data sources.
 
@@ -23,11 +38,13 @@ Check out our [Getting Started](./docs/getting_started.md) guide to help get our
 
 ## Contributing
 
+**NOTE: This project is being replaced by [Li](https://github.com/covidatlas/li), the next-generation serverless crawler for COVID-19 data.**
+
 You can contribute to this project in two big ways:
 
 ### Contribute to the project core
 
-Check the Issues for any task we need to get done. If you are new to open source, look for the label [`Good first issue`](https://github.com/lazd/coronadatascraper/labels/good%20first%20issue)
+Check the Issues for any task we need to get done. If you are new to open-source, look for the label [`Good first issue`](https://github.com/lazd/coronadatascraper/labels/good%20first%20issue)
 
 ### Contribute a source
 

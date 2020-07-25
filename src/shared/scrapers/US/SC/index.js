@@ -121,11 +121,27 @@ const scraper = {
       const dashboardId = '3732035614af4246877e20c3a496e397';
       const layerName = 'COVID19_County_Polygon_SharingView2'; // they started updating this view
       this.url = await fetch.getArcGISCSVURL(this, serverNumber, dashboardId, layerName);
-      const data = await fetch.csv(this, this.url, 'default');
+      let data = await fetch.csv(this, this.url, 'default');
+
+      // BOM hacking ... sigh.
+      data = data.map(d => {
+        if (d['ï»¿Date_'] && !d.Date_) d.Date_ = d['ï»¿Date_'];
+        return d;
+      });
+
       let counties = [];
       for (const county of data) {
-        if (datetime.scrapeDateIsBefore(county.Date_)) {
-          throw new Error(`Data only available until ${county.Date_}`);
+        // On 2020-4-28, SC switched from recording dates as UTC
+        // (eg, "2020-04-27T18:13:20.273Z") to epoch (eg,
+        // 1585082918049, an _integer_ = milliseconds from Jan 1,
+        // 1970).  The Date constructor handles both of these.
+        let d = county.Date_;
+        // Check if using epoch.
+        if (d.match(/^\d+$/)) d = parseInt(d, 10);
+        const countyDate = new Date(d);
+
+        if (datetime.scrapeDateIsBefore(countyDate)) {
+          throw new Error(`Data only available until ${countyDate}`);
         }
 
         counties.push({
